@@ -1,9 +1,30 @@
 from flask import Flask, request
 import os
+import json 
+
+BOOKS_FILE = "books.json"
 
 app = Flask(__name__)
 
-books = []
+def load_books():
+    try:
+        with open(BOOKS_FILE,'r')as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+    
+    
+books = load_books()
+
+def save_books():
+    with open(BOOKS_FILE, 'w') as f:
+        json.dump(books, f)
+
+
+@app.route("/")
+def index():
+    return "Books API running", 200
+
 
 # Get all books
 @app.get('/books')
@@ -29,6 +50,7 @@ def create_book():
         "author": data["author"]
     }
     books.append(new_book)
+    save_books()
     return new_book, 201
 
 # Update a book by ID
@@ -40,6 +62,7 @@ def update_book(id):
     if not data:
         return {"error": "Missing data"}, 400
     books[id].update({k: v for k, v in data.items() if k in ["title", "author"]})
+    save_books()
     return books[id], 200
 
 # Delete a book by ID
@@ -48,7 +71,9 @@ def delete_book(id):
     if id < 0 or id >= len(books):
         return {"error": "Book not found"}, 404
     deleted = books.pop(id)
+    save_books()
     return {"deleted": deleted}, 200
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))

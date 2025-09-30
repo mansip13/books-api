@@ -21,15 +21,6 @@ def save_books():
         json.dump(books, f)
 
 
-@app.route("/")
-def index():
-    return "Books API running", 200
-
-
-# Get all books
-@app.get('/books')
-def get_books():
-    return {"books": books}, 200
 
 # Get one book by ID
 @app.get('/books/<int:id>')
@@ -73,6 +64,7 @@ def delete_book(id):
     deleted = books.pop(id)
     save_books()
     return {"deleted": deleted}, 200
+
 @app.route("/", methods=["GET"])
 def root():
     return {"books": books}, 200
@@ -81,3 +73,4 @@ def root():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(host ="0.0.0.0",port = port, debug = True)
+    

@@ -73,6 +73,9 @@ def delete_book(id):
     deleted = books.pop(id)
     save_books()
     return {"deleted": deleted}, 200
+@app.route("/", methods=["GET"])
+def root():
+    return {"books": books}, 200
 
 
 if __name__ == "__main__":
